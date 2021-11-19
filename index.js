@@ -9,6 +9,7 @@ const json = {
     recipient: process.env.ADDRESS,
     tokenOut: process.env.EBA,
     mnemonic: process.env.MNEMONIC,
+    wssRpc: process.env.WSS_RPC
   }
 }
 
@@ -21,7 +22,7 @@ const addresses = {
 
 const mnemonic = json.data.mnemonic;
 
-const provider = new ethers.providers.WebSocketProvider('wss://bsc-ws-node.nariox.org:443')
+const provider = new ethers.providers.WebSocketProvider(json.data.wssRpc)
 const wallet = ethers.Wallet.fromMnemonic(mnemonic);
 const account = wallet.connect(provider);
 const factory = new ethers.Contract(
@@ -84,7 +85,7 @@ factory.on('PairCreated', async (token0, token1, pairAddress) => {
     return
   }
 
-  const amountIn = ethers.utils.parseUnits('1', 'ether');
+  const amountIn = ethers.utils.parseUnits('0.3', 'ether');
   const amounts = await router.getAmountsOut(amountIn, [tokenIn, tokenOut])
   const amountOutMin = amounts[1].sub(amounts[1].div(20))
   console.log(`
@@ -109,4 +110,4 @@ factory.on('PairCreated', async (token0, token1, pairAddress) => {
   console.log(receipt)
 })
 
-init().catch(err => { console.log(err) })
+init().catch(err => { console.log('error: ', err) })
